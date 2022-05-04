@@ -11,6 +11,7 @@ import (
 type listCmd struct {
 	main   string
 	source string
+	delete bool
 }
 
 func (*listCmd) Name() string     { return "list" }
@@ -23,11 +24,12 @@ func (*listCmd) Usage() string {
 func (l *listCmd) SetFlags(f *flag.FlagSet) {
 	f.StringVar(&l.main, "main", "", "add the main folder path")
 	f.StringVar(&l.source, "source", "", "add the source folder path")
+	f.BoolVar(&l.delete, "delete", false, "delete the duplicated files found")
 }
 
 func (l *listCmd) Execute(_ context.Context, _ *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
-	log.Printf("execute command with main : %s and source : %s", l.main, l.source)
-	err := core.FindDuplicates(l.main, l.source)
+	log.Printf("execute command with main : %s and source : %s\nand delete : %v", l.main, l.source, l.delete)
+	err := core.FindDuplicates(l.main, l.source, l.delete)
 	if err != nil {
 		log.Printf("error while finding duplicates : %s", err)
 		return subcommands.ExitFailure

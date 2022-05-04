@@ -6,10 +6,11 @@ import (
 	"io/fs"
 	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 )
 
-func FindDuplicates(mainFolder, sourceFolder string) error {
+func FindDuplicates(mainFolder, sourceFolder string, delete bool) error {
 	mapMain, err := ComputeHashOfFiles(mainFolder)
 	if err != nil {
 		return err
@@ -23,7 +24,16 @@ func FindDuplicates(mainFolder, sourceFolder string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("found %d duplicates", len(duplicates))
+	fmt.Printf("found %d duplicates :\n", len(duplicates))
+	for _, path := range duplicates {
+		fmt.Printf("%s\n", path)
+	}
+	if delete {
+		err := deleteDuplicates(duplicates)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -63,4 +73,14 @@ func CompareHash(main, source map[string]string) ([]string, error) {
 		}
 	}
 	return res, nil
+}
+
+func deleteDuplicates(pathsOfFilesToDelete []string) error {
+	for _, path := range pathsOfFilesToDelete {
+		err := os.Remove(path)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
