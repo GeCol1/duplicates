@@ -2,9 +2,10 @@ package cmd
 
 import (
 	"context"
+	"duplicates/core"
 	"flag"
-	"fmt"
 	"github.com/google/subcommands"
+	"log"
 )
 
 type ListCmd struct {
@@ -25,6 +26,11 @@ func (l *ListCmd) SetFlags(f *flag.FlagSet) {
 }
 
 func (l *ListCmd) Execute(_ context.Context, _ *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
-	fmt.Printf("args : %s et %s", l.main, l.source)
+	log.Printf("execute command with main : %s and source : %s", l.main, l.source)
+	err := core.FindDuplicates(l.main, l.source)
+	if err != nil {
+		log.Printf("error while finding duplicates : %s", err)
+		return subcommands.ExitFailure
+	}
 	return subcommands.ExitSuccess
 }
