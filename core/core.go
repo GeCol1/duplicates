@@ -1,6 +1,7 @@
 package core
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -11,6 +12,7 @@ import (
 )
 
 func FindDuplicates(mainFolder, sourceFolder string, delete bool) error {
+	logDuplicatesToFile := true
 	mapMain, err := ComputeHashOfFiles(mainFolder)
 	if err != nil {
 		return err
@@ -25,8 +27,28 @@ func FindDuplicates(mainFolder, sourceFolder string, delete bool) error {
 		return err
 	}
 	fmt.Printf("found %d duplicates :\n", len(duplicates))
+	duplicatesFile, err := os.OpenFile("doublons.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Printf("could not create file to list doublons : %s", err)
+		logDuplicatesToFile = false
+	}
+	defer func(duplicatesFile *os.File) {
+		err := duplicatesFile.Close()
+		if err != nil {
+
+		}
+	}(duplicatesFile)
+	fileWriter := bufio.NewWriter(duplicatesFile)
 	for _, path := range duplicates {
 		fmt.Printf("%s\n", path)
+		if logDuplicatesToFile {
+			//duplicatesFile.Write([]byte(path))
+			_, _ = fileWriter.Write([]byte(fmt.Sprintf("%s\n", path)))
+		}
+	}
+	err = fileWriter.Flush()
+	if err != nil {
+		return err
 	}
 	if delete {
 		err := deleteDuplicates(duplicates)
