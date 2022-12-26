@@ -10,3 +10,8 @@ Tools used before copying and merging folders of photos.
 - create a hash of all files of each folder
 - compare the hash
 - delete the file from folder 2
+
+### Code
+
+The code should follow the Google style guide :
+https://google.github.io/styleguide/go/guide
